@@ -1,0 +1,81 @@
+name: Deploy GetItDone
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  beta:
+    name: Deploy beta to us-west-2
+    runs-on: ubuntu-latest
+    environment: beta
+    env:
+      AWS_REGION: us-west-2
+      CDK_DEFAULT_REGION: us-west-2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::341853291300:role/GetItDoneGitHubActionsDeployRoleBeta
+          aws-region: us-west-2
+
+      - name: Deploy beta stack
+        run: |
+          npx cdk deploy --require-approval never \
+            --context environment=beta \
+            --context account=341853291300 \
+            --context region=us-west-2 \
+            GetItDoneCognitoStackBeta
+
+  prod:
+    name: Deploy prod to us-east-1
+    needs: beta
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      AWS_REGION: us-east-1
+      CDK_DEFAULT_REGION: us-east-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::341853291300:role/GetItDoneGitHubActionsDeployRoleProd
+          aws-region: us-east-1
+
+      - name: Deploy prod stack
+        run: |
+          npx cdk deploy --require-approval never \
+            --context environment=prod \
+            --context account=341853291300 \
+            --context region=us-east-1 \
+            GetItDoneCognitoStackProd
