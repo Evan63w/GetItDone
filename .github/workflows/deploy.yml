@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: beta
     env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
       AWS_REGION: us-west-2
       CDK_DEFAULT_REGION: us-west-2
     steps:
@@ -51,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
       AWS_REGION: us-east-1
       CDK_DEFAULT_REGION: us-east-1
     steps:
