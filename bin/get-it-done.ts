@@ -2,6 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { GetItDoneCognitoStack } from '../lib/get-it-done-cognito-stack';
+import { GetItDoneDataStack } from '../lib/get-it-done-data-stack';
 import { GitHubActionsOidcStack } from '../lib/github-actions-oidc-stack';
 
 const app = new cdk.App();
@@ -17,11 +18,23 @@ new GitHubActionsOidcStack(app, 'GitHubActionsOidcStack', {
     },
 });
 
-const stackId = environmentName === 'prod'
+const cognitoStackId = environmentName === 'prod'
     ? 'GetItDoneCognitoStackProd'
     : 'GetItDoneCognitoStackBeta';
 
-new GetItDoneCognitoStack(app, stackId, {
+new GetItDoneCognitoStack(app, cognitoStackId, {
+    env: {
+        account,
+        region,
+    },
+    environmentName,
+});
+
+const dataStackId = environmentName === 'prod'
+    ? 'GetItDoneDataStackProd'
+    : 'GetItDoneDataStackBeta';
+
+new GetItDoneDataStack(app, dataStackId, {
     env: {
         account,
         region,
