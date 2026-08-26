@@ -107,11 +107,15 @@ async function getUserTasks(userId: string): Promise<TaskRecord[]> {
 export async function listTasksHandler(event: any) {
     const userId = getUserIdFromEvent(event);
     if (!userId) {
+        console.warn('listTasksHandler: missing userId', { event });
         return jsonResponse(401, { message: 'Unauthorized' });
     }
 
+    console.info('listTasksHandler: request received', { userId, path: event?.rawPath, method: event?.requestContext?.http?.method });
+
     try {
         const tasks = await getUserTasks(userId);
+        console.info('listTasksHandler: tasks found', { userId, itemCount: tasks.length, taskIds: tasks.map((task) => task.taskId) });
         return jsonResponse(200, tasks.map((task) => ({
             id: task.taskId,
             title: task.title,
@@ -121,20 +125,26 @@ export async function listTasksHandler(event: any) {
             updatedAt: task.updatedAt,
         })));
     } catch (error) {
-        return jsonResponse(500, { message: 'Unable to fetch tasks', error: (error as Error).message });
+        const message = (error as Error).message;
+        console.error('listTasksHandler: failed', { userId, error: message });
+        return jsonResponse(500, { message: 'Unable to fetch tasks', error: message });
     }
 }
 
 export async function createTaskHandler(event: any) {
     const userId = getUserIdFromEvent(event);
     if (!userId) {
+        console.warn('createTaskHandler: missing userId', { event });
         return jsonResponse(401, { message: 'Unauthorized' });
     }
 
     const body = parseBody(event);
     const input = normalizeTaskInput(body);
 
+    console.info('createTaskHandler: request received', { userId, requestBody: body, normalizedInput: input });
+
     if (!input.title) {
+        console.warn('createTaskHandler: missing title', { userId, body });
         return jsonResponse(400, { message: 'Task title is required' });
     }
 
@@ -145,6 +155,8 @@ export async function createTaskHandler(event: any) {
             Item: task,
         }));
 
+        console.info('createTaskHandler: task created', { userId, taskId: task.taskId, title: task.title, taskType: task.taskType, done: task.done });
+
         return jsonResponse(201, {
             id: task.taskId,
             title: task.title,
@@ -154,18 +166,22 @@ export async function createTaskHandler(event: any) {
             updatedAt: task.updatedAt,
         });
     } catch (error) {
-        return jsonResponse(500, { message: 'Unable to create task', error: (error as Error).message });
+        const message = (error as Error).message;
+        console.error('createTaskHandler: failed', { userId, body, error: message });
+        return jsonResponse(500, { message: 'Unable to create task', error: message });
     }
 }
 
 export async function updateTaskHandler(event: any) {
     const userId = getUserIdFromEvent(event);
     if (!userId) {
+        console.warn('updateTaskHandler: missing userId', { event });
         return jsonResponse(401, { message: 'Unauthorized' });
     }
 
     const taskId = event?.pathParameters?.taskId;
     if (!taskId) {
+        console.warn('updateTaskHandler: missing taskId', { userId, event });
         return jsonResponse(400, { message: 'Task id is required' });
     }
 
@@ -175,7 +191,10 @@ export async function updateTaskHandler(event: any) {
         Object.entries(body).filter(([key]) => allowedFields.includes(key) && body[key] !== undefined)
     );
 
+    console.info('updateTaskHandler: request received', { userId, taskId, requestBody: body, updates });
+
     if (Object.keys(updates).length === 0) {
+        console.warn('updateTaskHandler: no valid fields', { userId, taskId, body });
         return jsonResponse(400, { message: 'No valid task fields were provided' });
     }
 
@@ -189,6 +208,7 @@ export async function updateTaskHandler(event: any) {
         }));
 
         if (!existing.Item) {
+            console.warn('updateTaskHandler: task not found', { userId, taskId });
             return jsonResponse(404, { message: 'Task not found' });
         }
 
@@ -222,6 +242,15 @@ export async function updateTaskHandler(event: any) {
         }));
 
         const updatedTask = result.Attributes as TaskRecord | undefined;
+        console.info('updateTaskHandler: task updated', {
+            userId,
+            taskId,
+            updatedTitle: updatedTask?.title,
+            updatedDone: updatedTask?.done,
+            updatedTaskType: updatedTask?.taskType,
+            updatedAt: updatedTask?.updatedAt,
+        });
+
         return jsonResponse(200, {
             id: updatedTask?.taskId,
             title: updatedTask?.title,
@@ -231,6 +260,8 @@ export async function updateTaskHandler(event: any) {
             updatedAt: updatedTask?.updatedAt,
         });
     } catch (error) {
-        return jsonResponse(500, { message: 'Unable to update task', error: (error as Error).message });
+        const message = (error as Error).message;
+        console.error('updateTaskHandler: failed', { userId, taskId, error: message });
+        return jsonResponse(500, { message: 'Unable to update task', error: message });
     }
 }
