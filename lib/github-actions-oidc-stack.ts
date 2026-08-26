@@ -27,12 +27,7 @@ export class GitHubActionsOidcStack extends cdk.Stack {
                 {
                     StringEquals: {
                         'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-                    },
-                    StringLike: {
-                        'token.actions.githubusercontent.com:sub': [
-                            `repo:${repo}:environment:beta`,
-                            `repo:${repo}:ref:refs/heads/main`,
-                        ],
+                        'token.actions.githubusercontent.com:sub': 'repo:Evan63w@35425719/GetItDone@1344538778:environment:beta',
                     },
                 },
                 'sts:AssumeRoleWithWebIdentity'
@@ -48,12 +43,7 @@ export class GitHubActionsOidcStack extends cdk.Stack {
                 {
                     StringEquals: {
                         'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-                    },
-                    StringLike: {
-                        'token.actions.githubusercontent.com:sub': [
-                            `repo:${repo}:environment:prod`,
-                            `repo:${repo}:ref:refs/heads/main`,
-                        ],
+                        'token.actions.githubusercontent.com:sub': 'repo:Evan63w@35425719/GetItDone@1344538778:environment:prod',
                     },
                 },
                 'sts:AssumeRoleWithWebIdentity'
