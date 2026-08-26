@@ -92,10 +92,21 @@ jobs:
 
       - name: Capture live beta deployment outputs
         run: |
-          echo "USER_POOL_ID=$(aws cloudformation describe-stacks --stack-name GetItDoneCognitoStackBeta --region us-west-2 --query 'Stacks[0].Outputs[?OutputKey==\`UserPoolId\`].OutputValue' --output text)" >> "$GITHUB_ENV"
-          echo "APP_CLIENT_ID=$(aws cloudformation describe-stacks --stack-name GetItDoneCognitoStackBeta --region us-west-2 --query 'Stacks[0].Outputs[?OutputKey==\`UserPoolClientId\`].OutputValue' --output text)" >> "$GITHUB_ENV"
-          echo "API_URL=$(aws cloudformation describe-stacks --stack-name GetItDoneTaskApiStackBeta --region us-west-2 --query 'Stacks[0].Outputs[?OutputKey==\`ApiUrl\`].OutputValue' --output text)" >> "$GITHUB_ENV"
-          echo "TASKS_TABLE_NAME=$(aws cloudformation describe-stacks --stack-name GetItDoneDataStackBeta --region us-west-2 --query 'Stacks[0].Outputs[?OutputKey==\`TasksTableName\`].OutputValue' --output text)" >> "$GITHUB_ENV"
+          get_stack_output() {
+            local stack_name="$1"
+            local output_key="$2"
+
+            aws cloudformation describe-stacks \
+              --stack-name "$stack_name" \
+              --region us-west-2 \
+              --query "Stacks[0].Outputs[?OutputKey=='${output_key}'].OutputValue" \
+              --output text
+          }
+
+          echo "USER_POOL_ID=$(get_stack_output GetItDoneCognitoStackBeta UserPoolId)" >> "$GITHUB_ENV"
+          echo "APP_CLIENT_ID=$(get_stack_output GetItDoneCognitoStackBeta UserPoolClientId)" >> "$GITHUB_ENV"
+          echo "API_URL=$(get_stack_output GetItDoneTaskApiStackBeta ApiUrl)" >> "$GITHUB_ENV"
+          echo "TASKS_TABLE_NAME=$(get_stack_output GetItDoneDataStackBeta TasksTableName)" >> "$GITHUB_ENV"
 
       - name: Validate live beta integration inputs
         run: |
