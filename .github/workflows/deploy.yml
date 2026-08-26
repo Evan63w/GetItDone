@@ -67,6 +67,7 @@ jobs:
           echo "USER_POOL_ID=$(aws cloudformation describe-stacks --stack-name GetItDoneCognitoStackBeta --query 'Stacks[0].Outputs[?OutputKey==\`UserPoolId\`].OutputValue' --output text)" >> "$GITHUB_ENV"
           echo "APP_CLIENT_ID=$(aws cloudformation describe-stacks --stack-name GetItDoneCognitoStackBeta --query 'Stacks[0].Outputs[?OutputKey==\`UserPoolClientId\`].OutputValue' --output text)" >> "$GITHUB_ENV"
           echo "API_URL=$(aws cloudformation describe-stacks --stack-name GetItDoneTaskApiStackBeta --query 'Stacks[0].Outputs[?OutputKey==\`ApiUrl\`].OutputValue' --output text)" >> "$GITHUB_ENV"
+          echo "TASKS_TABLE_NAME=$(aws cloudformation describe-stacks --stack-name GetItDoneDataStackBeta --query 'Stacks[0].Outputs[?OutputKey==\`TasksTableName\`].OutputValue' --output text)" >> "$GITHUB_ENV"
 
       - name: Run beta integration test
         env:
@@ -75,6 +76,7 @@ jobs:
           GETITDONE_BETA_USER_POOL_ID: ${{ env.USER_POOL_ID }}
           GETITDONE_BETA_APP_CLIENT_ID: ${{ env.APP_CLIENT_ID }}
           GETITDONE_BETA_API_URL: ${{ env.API_URL }}
+          GETITDONE_BETA_TASKS_TABLE_NAME: ${{ env.TASKS_TABLE_NAME }}
         run: npm test
 
   prod:
