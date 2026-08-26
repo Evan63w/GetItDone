@@ -23,6 +23,12 @@
         "resolveJsonModule": true,
         "outDir": "cdk.out"
     },
+    "include": [
+        "bin/**/*.ts",
+        "lib/**/*.ts",
+        "lambda/**/*.ts",
+        "test/**/*.ts"
+    ],
     "exclude": [
         "node_modules",
         "cdk.out"

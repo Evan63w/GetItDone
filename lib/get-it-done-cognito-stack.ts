@@ -9,6 +9,9 @@ export interface GetItDoneEnvironmentStackProps extends cdk.StackProps {
 }
 
 export class GetItDoneCognitoStack extends cdk.Stack {
+    public readonly userPool: cognito.UserPool;
+    public readonly webClient: cognito.UserPoolClient;
+
     constructor(scope: Construct, id: string, props: GetItDoneEnvironmentStackProps) {
         super(scope, id, props);
 
@@ -26,7 +29,7 @@ export class GetItDoneCognitoStack extends cdk.Stack {
             autoDeleteObjects: true,
         });
 
-        const userPool = new cognito.UserPool(this, 'UserPool', {
+        this.userPool = new cognito.UserPool(this, 'UserPool', {
             userPoolName: `get-it-done-${environmentName}-user-pool`,
             signInAliases: {
                 email: true,
@@ -62,7 +65,7 @@ export class GetItDoneCognitoStack extends cdk.Stack {
             .toLowerCase()
             .slice(0, 63);
 
-        const domain = userPool.addDomain('CognitoDomain', {
+        const domain = this.userPool.addDomain('CognitoDomain', {
             cognitoDomain: {
                 domainPrefix,
             },
@@ -72,8 +75,8 @@ export class GetItDoneCognitoStack extends cdk.Stack {
             ? ['https://beta.getitdone.local/callback', 'http://localhost:3000/callback']
             : ['https://prod.getitdone.local/callback', 'http://localhost:3000/callback'];
 
-        const webClient = new cognito.UserPoolClient(this, 'WebClient', {
-            userPool,
+        this.webClient = new cognito.UserPoolClient(this, 'WebClient', {
+            userPool: this.userPool,
             userPoolClientName: `get-it-done-${environmentName}-web-client`,
             authFlows: {
                 userPassword: true,
@@ -102,11 +105,11 @@ export class GetItDoneCognitoStack extends cdk.Stack {
         });
 
         new cdk.CfnOutput(this, 'UserPoolId', {
-            value: userPool.userPoolId,
+            value: this.userPool.userPoolId,
         });
 
         new cdk.CfnOutput(this, 'UserPoolClientId', {
-            value: webClient.userPoolClientId,
+            value: this.webClient.userPoolClientId,
         });
 
         new cdk.CfnOutput(this, 'UserPoolDomain', {

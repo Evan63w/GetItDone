@@ -8,13 +8,15 @@ export interface GetItDoneDataStackProps extends cdk.StackProps {
 }
 
 export class GetItDoneDataStack extends cdk.Stack {
+    public readonly tasksTable: dynamodb.Table;
+
     constructor(scope: Construct, id: string, props: GetItDoneDataStackProps) {
         super(scope, id, props);
 
         const environmentName = props.environmentName;
         const tableName = `get-it-done-${environmentName}-tasks`;
 
-        const tasksTable = new dynamodb.Table(this, 'TasksTable', {
+        this.tasksTable = new dynamodb.Table(this, 'TasksTable', {
             tableName,
             partitionKey: {
                 name: 'pk',
@@ -36,7 +38,7 @@ export class GetItDoneDataStack extends cdk.Stack {
             stream: dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
         });
 
-        tasksTable.addGlobalSecondaryIndex({
+        this.tasksTable.addGlobalSecondaryIndex({
             indexName: 'gsi1',
             partitionKey: {
                 name: 'gsi1pk',
@@ -50,11 +52,11 @@ export class GetItDoneDataStack extends cdk.Stack {
         });
 
         new cdk.CfnOutput(this, 'TasksTableName', {
-            value: tasksTable.tableName,
+            value: this.tasksTable.tableName,
         });
 
         new cdk.CfnOutput(this, 'TasksTableArn', {
-            value: tasksTable.tableArn,
+            value: this.tasksTable.tableArn,
         });
     }
 }

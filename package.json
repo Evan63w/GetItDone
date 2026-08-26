@@ -6,16 +6,21 @@
         "build": "tsc",
         "watch": "tsc -w",
         "cdk": "cdk",
-        "synth": "cdk synth"
+        "synth": "cdk synth",
+        "test": "node --test --import tsx"
     },
     "devDependencies": {
         "@types/node": "^20.14.12",
         "aws-cdk": "^2.151.0",
         "ts-node": "^10.9.0",
+        "tsx": "^4.21.0",
         "typescript": "^5.5.4"
     },
     "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.100.0",
+        "@aws-sdk/lib-dynamodb": "^3.100.0",
         "aws-cdk-lib": "^2.151.0",
-        "constructs": "^10.0.0"
+        "constructs": "^10.0.0",
+        "esbuild": "^0.25.0"
     }
 }
