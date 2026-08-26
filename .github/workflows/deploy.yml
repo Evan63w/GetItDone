@@ -52,13 +52,15 @@ jobs:
           role-to-assume: arn:aws:iam::341853291300:role/GetItDoneGitHubActionsDeployRoleBeta
           aws-region: us-west-2
 
-      - name: Deploy beta stack
+      - name: Deploy beta stacks
         run: |
           npx cdk deploy --require-approval never \
             --context environment=beta \
             --context account=341853291300 \
             --context region=us-west-2 \
-            GetItDoneCognitoStackBeta
+            GetItDoneCognitoStackBeta \
+            GetItDoneDataStackBeta \
+            GetItDoneTaskApiStackBeta
 
   prod:
     name: Deploy prod to us-east-1
@@ -88,10 +90,12 @@ jobs:
           role-to-assume: arn:aws:iam::341853291300:role/GetItDoneGitHubActionsDeployRoleProd
           aws-region: us-east-1
 
-      - name: Deploy prod stack
+      - name: Deploy prod stacks
         run: |
           npx cdk deploy --require-approval never \
             --context environment=prod \
             --context account=341853291300 \
             --context region=us-east-1 \
-            GetItDoneCognitoStackProd
+            GetItDoneCognitoStackProd \
+            GetItDoneDataStackProd \
+            GetItDoneTaskApiStackProd
