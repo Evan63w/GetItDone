@@ -97,6 +97,14 @@ jobs:
           echo "API_URL=$(aws cloudformation describe-stacks --stack-name GetItDoneTaskApiStackBeta --region us-west-2 --query 'Stacks[0].Outputs[?OutputKey==\`ApiUrl\`].OutputValue' --output text)" >> "$GITHUB_ENV"
           echo "TASKS_TABLE_NAME=$(aws cloudformation describe-stacks --stack-name GetItDoneDataStackBeta --region us-west-2 --query 'Stacks[0].Outputs[?OutputKey==\`TasksTableName\`].OutputValue' --output text)" >> "$GITHUB_ENV"
 
+      - name: Validate live beta integration inputs
+        run: |
+          test -n "$USER_POOL_ID"
+          test -n "$APP_CLIENT_ID"
+          test -n "$API_URL"
+          test -n "$TASKS_TABLE_NAME"
+          echo "Live beta integration inputs loaded for AWS validation"
+
       - name: Run live beta integration test
         env:
           RUN_INTEGRATION_TESTS: "true"
