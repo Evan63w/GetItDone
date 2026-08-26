@@ -24,8 +24,8 @@ const integrationTestOptions = {
 
 test('beta integration: create user, create task, and update task', integrationTestOptions, async () => {
     const now = Date.now();
-    const username = `beta-user-${now}`;
     const email = `beta-user-${now}@example.com`;
+    const username = email;
     const password = 'TestPassword123!';
 
     const cognito = new CognitoIdentityProviderClient({ region });

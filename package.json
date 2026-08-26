@@ -7,7 +7,7 @@
         "watch": "tsc -w",
         "cdk": "cdk",
         "synth": "cdk synth",
-        "test": "node --test --import tsx \"test/**/*.test.ts\""
+        "test": "node --test --import tsx ./test/tasks.test.ts ./test/beta-task-flow.integration.test.ts"
     },
     "devDependencies": {
         "@types/node": "^20.14.12",
